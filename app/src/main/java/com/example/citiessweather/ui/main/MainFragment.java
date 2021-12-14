@@ -57,7 +57,7 @@ public class MainFragment extends Fragment {
                 items
         );
 
-        sharedViewModel = ViewModelProviders.of(requireActivity()).get(
+        sharedViewModel = ViewModelProviders.of(getActivity()).get(
                 SharedViewModel.class
         );
 

@@ -53,7 +53,7 @@ public class City implements Serializable {
     }
 
     public void setIcon(String icon) {
-        this.icon = "https://openweathermap.org/img/wn/"+icon+"@2x.png";
+        this.icon = icon;
     }
 
     public String getTemp() {

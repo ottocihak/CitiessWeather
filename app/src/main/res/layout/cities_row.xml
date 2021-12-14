@@ -38,8 +38,10 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <ImageView
         android:id="@+id/weatherIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:maxWidth="25dp"
+        android:maxHeight="25dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="parent"

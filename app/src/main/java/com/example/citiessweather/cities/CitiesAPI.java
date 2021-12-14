@@ -29,14 +29,14 @@ public class CitiesAPI {
 
     HashMap<String,String> getWeather(String city){
         try {
-            Log.d("DEBUG",""+city);
+            if (city==null) return null;
             String url = "https://api.openweathermap.org/data/2.5/weather?q="+city.toLowerCase(Locale.ROOT)+"&appid=0fa3458c2e34936b0dad44dc6699956c";
             String jsonResponse = HttpUtils.get(url);
             return processJsonWeather(jsonResponse);
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
-        return null;
     }
 
     private ArrayList<City> doCall(String url) {
@@ -59,9 +59,10 @@ public class CitiesAPI {
             Log.d("DEBUG",""+data);
 
             weather.put("main",weatherCity.getJSONObject(0).getString("main"));
-            Log.d("DEBUG",""+weather.get("main"));
+            Log.d("DEBUG",weatherCity.getJSONObject(0).getString("icon"));
 
             weather.put("description",weatherCity.getJSONObject(0).getString("description"));
+            weather.put("pic",weatherCity.getJSONObject(0).getString("icon"));
             weather.put("temp",main.getString("temp"));
             weather.put("temp_min",main.getString("temp_min"));
             weather.put("temp_max",main.getString("temp_max"));
@@ -89,23 +90,27 @@ public class CitiesAPI {
 
                 JSONObject jsonCity = jsonCities.getJSONObject(i);
 
-                if (jsonCity.getString("name").indexOf(" ") == -1) {
+                if (jsonCity.getString("capital").indexOf(" ") == -1) {
                 City city = new City();
-                city.setName(jsonCity.getString("name"));
-                city.setCountry(jsonCity.getString("country"));
+                city.setName(jsonCity.getString("capital"));
+                city.setCountry(jsonCity.getString("name"));
 
                 HashMap<String,String> weather = getWeather(city.getName());
 
-                city.setMain(weather.get("main"));
-                city.setDescription(weather.get("description"));
-                city.setTemp(weather.get("temp"));
-                city.setTemp_max(weather.get("temp_max"));
-                city.setTemp_min(weather.get("temp_min"));
-                city.setHumidity(weather.get("humidity"));
+                    if (weather!=null) {
+                    city.setMain(weather.get("main"));
+                    city.setDescription(weather.get("description"));
+                    city.setTemp(weather.get("temp"));
+                    city.setIcon(weather.get("pic"));
+                        Log.d("DEBUG",""+city.getIcon());
+                    city.setTemp_max(weather.get("temp_max"));
+                    city.setTemp_min(weather.get("temp_min"));
+                    city.setHumidity(weather.get("humidity"));
 
-                Log.d("DEBUG",""+i);
+                    Log.d("DEBUG", "" + i);
 
-                cities.add(city);
+                    cities.add(city);
+                    }
                 }
 
             }
