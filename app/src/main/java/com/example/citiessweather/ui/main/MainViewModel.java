@@ -1,7 +1,59 @@
 package com.example.citiessweather.ui.main;
 
-import androidx.lifecycle.ViewModel;
+import android.app.Application;
+import android.os.AsyncTask;
 
-public class MainViewModel extends ViewModel {
-    // TODO: Implement the ViewModel
+import androidx.annotation.NonNull;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+
+import com.example.citiessweather.cities.CitiesAPI;
+import com.example.citiessweather.cities.City;
+import com.example.citiessweather.database.CitiesDao;
+import com.example.citiessweather.database.DataManager;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainViewModel extends AndroidViewModel {
+
+    private final Application app;
+    private final DataManager dataManager;
+    private final CitiesDao citiesDao;
+    private LiveData<List<City>> cities;
+
+    public MainViewModel (Application application) {
+        super(application);
+
+        this.app = application;
+        this.dataManager = DataManager.getDatabase(
+                this.getApplication());
+        this.citiesDao = dataManager.getCitiesDao();
+    }
+
+    public LiveData<List<City>> getCities() {
+        return citiesDao.getCities();
+    }
+
+    public void reload() {
+        RefreshDataTask task = new RefreshDataTask();
+        task.execute();
+    }
+
+    private class RefreshDataTask extends AsyncTask<Void,Void,Void> {
+        @Override
+        protected Void doInBackground(Void... voids) {
+
+            CitiesAPI api = new CitiesAPI();
+            ArrayList<City> result;
+
+            result = api.getCitiesByCapital();
+
+
+            citiesDao.deleteCards();
+            citiesDao.addCities(result);
+
+            return null;
+        }
+    }
 }
