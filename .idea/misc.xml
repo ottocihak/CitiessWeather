@@ -3,14 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout-large/main_activity.xml" value="0.270703125" />
+        <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout-large/main_fragment.xml" value="0.270703125" />
         <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout-large/shared_layout.xml" value="0.270703125" />
         <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout/cities_row.xml" value="0.3609375" />
+        <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout/details_activity.xml" value="0.3609375" />
         <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout/details_fragment.xml" value="0.3609375" />
         <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout/main_activity.xml" value="0.3609375" />
         <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout/main_fragment.xml" value="0.3609375" />
         <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/layout/shared_layout.xml" value="0.3609375" />
         <entry key="..\:/Users/otto/AndroidStudioProjects/CitiessWeather/app/src/main/res/menu/menu_main.xml" value="0.2484375" />
-        <entry key="app/src/main/res/layout/cities_row.xml" value="0.13903985507246377" />
       </map>
     </option>
   </component>
