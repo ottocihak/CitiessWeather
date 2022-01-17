@@ -13,8 +13,17 @@ import java.util.List;
 @Dao
 public interface CitiesDao {
 
-    @Query("SELECT * FROM city")
-    LiveData<List<City>> getCities();
+    @Query("SELECT * FROM city WHERE name LIKE '%' || :cityName || '%' ORDER BY name")
+    LiveData<List<City>> getCities(String cityName);
+
+    @Query("SELECT * FROM city WHERE (lon < :lonC+15 AND lon > :lonC-15) AND (lat < :latC+15 AND lat > :latC-15)  ORDER BY name")
+    LiveData<List<City>> getCitiesCloseBy(int lonC, int latC);
+
+    @Query("SELECT * FROM city ORDER BY `temp` ASC")
+    LiveData<List<City>> getCitiesOrderedByTempC();
+
+    @Query("SELECT * FROM city ORDER BY `temp` DESC")
+    LiveData<List<City>> getCitiesOrderedByTempH();
 
     @Insert
     void addCity(City city);
@@ -26,5 +35,5 @@ public interface CitiesDao {
     void deleteCity(City city);
 
     @Query("DELETE FROM city")
-    void deleteCards();
+    void deleteCities();
 }

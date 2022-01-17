@@ -1,8 +1,10 @@
 package com.example.citiessweather.ui.main;
 
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -10,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.preference.CheckBoxPreference;
+import androidx.preference.PreferenceManager;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,11 +26,13 @@ import android.widget.ListView;
 
 import com.example.citiessweather.DetailsActivity;
 import com.example.citiessweather.R;
+import com.example.citiessweather.SettingsActivity;
 import com.example.citiessweather.cities.CitiesAPI;
 import com.example.citiessweather.cities.CitiesAdapter;
 import com.example.citiessweather.cities.City;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MainFragment extends Fragment {
@@ -46,6 +52,11 @@ public class MainFragment extends Fragment {
                              @Nullable Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.main_fragment, container, false);
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        String cityName = preferences.getString("cityNameKey","");
+
+        Log.d("TAG", "onCreateView: " + cityName);
 
         citiesWeather = view.findViewById(R.id.citiesWeather);
 
@@ -75,7 +86,7 @@ public class MainFragment extends Fragment {
         });
 
         mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        mViewModel.getCities().observe(getViewLifecycleOwner(), cities -> {
+        mViewModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
             citiesAdapter.clear();
             citiesAdapter.addAll(cities);
         });
@@ -95,8 +106,14 @@ public class MainFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
         if (id == R.id.action_refresh) {
             refresh();
+            return true;
+        }
+        if (id == R.id.settings) {
+            Intent i = new Intent(getContext(), SettingsActivity.class);
+            startActivity(i);
             return true;
         }
 
@@ -129,4 +146,42 @@ public class MainFragment extends Fragment {
         mViewModel.reload();
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+
+        String cityName = preferences.getString("cityNameKey","");
+
+        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+        mViewModel.getCities(cityName).removeObservers(getViewLifecycleOwner());
+
+        if (cityName.equals("")){
+            mViewModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
+                citiesAdapter.clear();
+                citiesAdapter.addAll(cities);
+            });
+        }
+
+        if (preferences.getBoolean("alphaOrder",false)){
+            mViewModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
+                citiesAdapter.clear();
+                citiesAdapter.addAll(cities);
+            });
+        } else if (preferences.getBoolean("coldestToHottest",false)){
+            mViewModel.getCitiesOrderedByTempC().observe(getViewLifecycleOwner(), cities -> {
+                citiesAdapter.clear();
+                citiesAdapter.addAll(cities);
+            });
+        } else if (preferences.getBoolean("hottestToColdest",false)) {
+            mViewModel.getCitiesOrderedByTempH().observe(getViewLifecycleOwner(), cities -> {
+                citiesAdapter.clear();
+                citiesAdapter.addAll(cities);
+            });
+        }
+
+
+
+    }
 }

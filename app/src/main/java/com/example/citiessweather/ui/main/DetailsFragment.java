@@ -1,5 +1,8 @@
 package com.example.citiessweather.ui.main;
 
+import com.example.citiessweather.DetailsActivity;
+import com.example.citiessweather.R;
+import com.example.citiessweather.cities.CitiesAdapter;
 import com.example.citiessweather.cities.City;
 import com.example.citiessweather.databinding.DetailsFragmentBinding;
 import android.content.Context;
@@ -27,9 +30,15 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.bumptech.glide.Glide;
 
+import java.util.ArrayList;
+
 public class DetailsFragment extends Fragment {
     private View view;
     private DetailsFragmentBinding binding;
+
+    private ListView citiesWeather;
+    private CitiesAdapter citiesAdapter;
+    private MainViewModel mViewModel;
 
     public DetailsFragment() {
     }
@@ -51,6 +60,32 @@ public class DetailsFragment extends Fragment {
 
             if (city != null) {
                 updateUi(city);
+
+                citiesWeather = view.findViewById(R.id.citiesCloseByList);
+
+                ArrayList<City> items = new ArrayList<>();
+
+                citiesAdapter = new CitiesAdapter(
+                        getContext(),
+                        R.layout.cities_row,
+                        items
+                );
+
+                citiesWeather.setAdapter(citiesAdapter);
+
+                citiesWeather.setOnItemClickListener((adapter, fragment, j, l) -> {
+                    City secondCity = (City) adapter.getItemAtPosition(j);
+                        Intent intent = new Intent(getContext(), DetailsActivity.class);
+                        intent.putExtra("city", secondCity);
+                        startActivity(intent);
+                });
+
+                mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
+                mViewModel.getCitiesCloseBy(city.getLon(),city.getLat()).observe(getViewLifecycleOwner(), cities -> {
+                    citiesAdapter.clear();
+                    citiesAdapter.addAll(cities);
+                });
+
             }
         }
 
@@ -63,18 +98,21 @@ public class DetailsFragment extends Fragment {
                 updateUi(city);
             }
         });
+
+
+
         return view;
     }
 
     private void updateUi(City city) {
-        Log.d("CARD", city.toString());
 
         binding.cityNameDe.setText(city.getName());
         binding.cityMainDe.setText(city.getMain());
-        binding.weatherDes.setText(city.getDescription());
-        binding.temp.setText(city.getTemp()+"ºF");
-        binding.tempDe.setText(city.getTemp_max()+"ºF Max/"+city.getTemp_min()+"ºF Min");
-        binding.humility.setText(city.getHumidity());
+        binding.weatherDes.setText("Weather:"+'\n'+city.getDescription());
+        binding.citiesCloseBy.setText("Cities Close By");
+        binding.temp.setText("Temp:"+'\n'+city.getTemp()+"ºF");
+        binding.tempDe.setText('\n'+city.getTemp_max()+"ºF Max/"+city.getTemp_min()+"ºF Min");
+        binding.humility.setText("Humility"+'\n'+city.getHumidity());
         Glide.with(getContext()).load(
                 city.getIcon()
         ).into(binding.cityWePic);

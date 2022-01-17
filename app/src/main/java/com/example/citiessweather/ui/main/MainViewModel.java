@@ -31,8 +31,17 @@ public class MainViewModel extends AndroidViewModel {
         this.citiesDao = dataManager.getCitiesDao();
     }
 
-    public LiveData<List<City>> getCities() {
-        return citiesDao.getCities();
+    public LiveData<List<City>> getCities(String name) {
+        return citiesDao.getCities(name);
+    }
+    public LiveData<List<City>> getCitiesCloseBy(int lon, int lat) {
+        return citiesDao.getCitiesCloseBy(lon,lat);
+    }
+    public LiveData<List<City>> getCitiesOrderedByTempC() {
+        return citiesDao.getCitiesOrderedByTempC();
+    }
+    public LiveData<List<City>> getCitiesOrderedByTempH() {
+        return citiesDao.getCitiesOrderedByTempH();
     }
 
     public void reload() {
@@ -50,7 +59,7 @@ public class MainViewModel extends AndroidViewModel {
             result = api.getCitiesByCapital();
 
 
-            citiesDao.deleteCards();
+            citiesDao.deleteCities();
             citiesDao.addCities(result);
 
             return null;

@@ -55,6 +55,7 @@ public class CitiesAPI {
             JSONObject data = new JSONObject(jsonResponse);
             JSONArray weatherCity = data.getJSONArray("weather");
             JSONObject main = data.getJSONObject("main");
+            JSONObject coord = data.getJSONObject("coord");
 
             Log.d("DEBUG",""+data);
 
@@ -67,8 +68,10 @@ public class CitiesAPI {
             weather.put("temp_min",main.getString("temp_min"));
             weather.put("temp_max",main.getString("temp_max"));
             weather.put("humidity", main.getString("humidity")+"%");
+            weather.put("lon", coord.getString("lon"));
+            weather.put("lat", coord.getString("lat"));
 
-            Log.d("DEBUG",""+weather.get("main")+weather.get("description"));
+            Log.d("DEBUG",""+weather.get("main")+weather.get("lon")+weather.get("lat"));
 
             return weather;
         } catch (JSONException e) {
@@ -102,10 +105,15 @@ public class CitiesAPI {
                     city.setDescription(weather.get("description"));
                     city.setTemp(weather.get("temp"));
                     city.setIcon(weather.get("pic"));
-                        Log.d("DEBUG",""+city.getIcon());
                     city.setTemp_max(weather.get("temp_max"));
                     city.setTemp_min(weather.get("temp_min"));
                     city.setHumidity(weather.get("humidity"));
+                    String lon = weather.get("lon");
+                    String lat = weather.get("lat");
+                        Log.d("DEBUG",""+Integer.valueOf(lon.substring(0,lon.indexOf('.')==-1?lon.length():lon.indexOf('.'))));
+                    city.setLon(Integer.valueOf(lon.substring(0,lon.indexOf('.')==-1?lon.length():lon.indexOf('.'))));
+                    city.setLat(Integer.valueOf(lat.substring(0,lat.indexOf('.')==-1?lat.length():lat.indexOf('.'))));
+
 
                     Log.d("DEBUG", "" + i);
 

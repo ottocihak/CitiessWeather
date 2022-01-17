@@ -8,7 +8,7 @@ import androidx.room.RoomDatabase;
 
 import com.example.citiessweather.cities.City;
 
-@Database(entities = {City.class}, version = 1)
+@Database(version = 1, entities = {City.class})
 public abstract class DataManager extends RoomDatabase {
 
     private static DataManager INSTANCE;

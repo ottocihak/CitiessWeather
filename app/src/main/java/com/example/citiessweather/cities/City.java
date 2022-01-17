@@ -19,6 +19,8 @@ public class City implements Serializable {
     String temp_max;
     String humidity;
     String country;
+    int lon;
+    int lat;
 
     public int getId() {return id;}
 
@@ -53,7 +55,12 @@ public class City implements Serializable {
     }
 
     public void setIcon(String icon) {
-        this.icon = "http://openweathermap.org/img/wn/"+icon+"@2x.png";
+
+        if (icon.length()>3){
+            this.icon=icon;
+        } else {
+            this.icon = "http://openweathermap.org/img/wn/"+icon+"@2x.png";
+        }
     }
 
     public String getTemp() {
@@ -94,5 +101,21 @@ public class City implements Serializable {
 
     public void setCountry(String country) {
         this.country = country;
+    }
+
+    public int getLon() {
+        return lon;
+    }
+
+    public void setLon(int lon) {
+        this.lon = lon;
+    }
+
+    public int getLat() {
+        return lat;
+    }
+
+    public void setLat(int lat) {
+        this.lat = lat;
     }
 }
