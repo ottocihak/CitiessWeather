@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/evidenceMinTemp"
+        android:layout_width="168dp"
+        android:layout_height="50dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Min Temp"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:singleLine="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/evidenceMaxTemp"
+        app:layout_constraintTop_toBottomOf="@+id/evidenceLat" />
+
+    <TextView
+        android:id="@+id/evidneceTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="Weather evidence"
+        android:textSize="34sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/evidenceLat"
+        android:layout_width="168dp"
+        android:layout_height="50dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:hint="Latitude"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:singleLine="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/evidneceTitle" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/evidenceMaxTemp"
+        android:layout_width="168dp"
+        android:layout_height="50dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:hint="Max temp"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:singleLine="false"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/evidenceLat" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/EvidenceMainWeather"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Main Weather"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:singleLine="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/evidenceMaxTemp" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/evidenceMainWeather"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Address"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:singleLine="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/EvidenceMainWeather" />
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/evidenceLon"
+        android:layout_width="168dp"
+        android:layout_height="50dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Longitude"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:singleLine="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/evidenceLat"
+        app:layout_constraintTop_toBottomOf="@+id/evidneceTitle" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
