@@ -10,8 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.CheckBoxPreference;
 import androidx.preference.PreferenceManager;
 
 public class SettingsActivity extends AppCompatActivity {

@@ -19,6 +19,7 @@
         <entry key="app/src/main/res/layout/evidence_row.xml" value="0.25" />
         <entry key="app/src/main/res/layout/main_fragment.xml" value="0.12001811594202899" />
         <entry key="app/src/main/res/layout/map_fragment.xml" value="0.12001811594202899" />
+        <entry key="app/src/main/res/xml/root_preferences.xml" value="0.1" />
       </map>
     </option>
   </component>

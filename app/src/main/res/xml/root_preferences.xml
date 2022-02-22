@@ -1,33 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory app:title="Filters">
 
-
-
         <EditTextPreference
             android:key="cityNameKey"
-            android:title="City name"
-            app:useSimpleSummaryProvider="true"/>
+            android:title="City name" />
         <CheckBoxPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="alphaOrder"
-            app:title="Alphabetical Order"
             android:enabled="true"
-            app:useSimpleSummaryProvider="true" />
+            android:key="alphaOrder"
+            android:title="Alphabetical Orde" />
         <CheckBoxPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="coldestToHottest"
-            app:title="Coldest to hottest"
             android:enabled="true"
-            app:useSimpleSummaryProvider="true" />
+            android:key="coldestToHottest"
+            android:title="Coldest to hottest" />
         <CheckBoxPreference
-            app:key="hottestToColdest"
-            app:title="Hottest  to coldest"
             android:enabled="true"
-            app:useSimpleSummaryProvider="true" />
+            android:key="hottestToColdest"
+            android:title="Hottest  to coldest" />
 
     </PreferenceCategory>
 
