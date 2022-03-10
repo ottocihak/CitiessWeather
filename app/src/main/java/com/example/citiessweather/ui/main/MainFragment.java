@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.preference.CheckBoxPreference;
 import androidx.preference.PreferenceManager;
+import com.example.citiessweather.databinding.MainFragmentBinding;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,10 +33,11 @@ import com.example.citiessweather.cities.CitiesAdapter;
 import com.example.citiessweather.cities.City;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class MainFragment extends Fragment {
+
+    private View view;
+    private MainFragmentBinding binding;
 
     private MainViewModel mViewModel;
     private ListView citiesWeather;
@@ -51,14 +53,15 @@ public class MainFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.main_fragment, container, false);
+        binding = MainFragmentBinding.inflate(inflater);
+        view = binding.getRoot();
 
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
         String cityName = preferences.getString("cityNameKey","");
 
         Log.d("TAG", "onCreateView: " + cityName);
 
-        citiesWeather = view.findViewById(R.id.citiesWeather);
+        citiesWeather = binding.citiesWeather;
 
         ArrayList<City> items = new ArrayList<>();
 
