@@ -25,6 +25,10 @@ public interface CitiesDao {
     @Query("SELECT * FROM city ORDER BY `temp` DESC")
     LiveData<List<City>> getCitiesOrderedByTempH();
 
+    @Query("SELECT * FROM city ORDER BY `main`")
+    LiveData<List<City>> getCitiesOrderedByTypeWeather();
+
+
     @Insert
     void addCity(City city);
 

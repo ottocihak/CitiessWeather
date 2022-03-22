@@ -20,7 +20,6 @@ public class MainViewModel extends AndroidViewModel {
     private final Application app;
     private final DataManager dataManager;
     private final CitiesDao citiesDao;
-    private LiveData<List<City>> cities;
 
     public MainViewModel (Application application) {
         super(application);
@@ -42,6 +41,9 @@ public class MainViewModel extends AndroidViewModel {
     }
     public LiveData<List<City>> getCitiesOrderedByTempH() {
         return citiesDao.getCitiesOrderedByTempH();
+    }
+    public LiveData<List<City>> getCitiesOrderedByTypeWeather() {
+        return citiesDao.getCitiesOrderedByTypeWeather();
     }
 
     public void reload() {

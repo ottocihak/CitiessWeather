@@ -18,7 +18,7 @@ public abstract class DataManager extends RoomDatabase {
             INSTANCE =
                     Room.databaseBuilder(
                             context.getApplicationContext(),
-                            DataManager.class, "db"
+                            DataManager.class, "db_weather"
                     ).build();
         }
         return INSTANCE;

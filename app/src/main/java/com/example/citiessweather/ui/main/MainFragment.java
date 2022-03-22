@@ -1,21 +1,16 @@
 package com.example.citiessweather.ui.main;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.PreferenceManager;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,13 +22,10 @@ import android.widget.ListView;
 import com.example.citiessweather.DetailsActivity;
 import com.example.citiessweather.R;
 import com.example.citiessweather.SettingsActivity;
-import com.example.citiessweather.cities.CitiesAPI;
 import com.example.citiessweather.cities.CitiesAdapter;
 import com.example.citiessweather.cities.City;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 public class MainFragment extends Fragment {
 
@@ -53,10 +45,12 @@ public class MainFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.main_fragment, container, false);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
-        String cityName = preferences.getString("cityNameKey","");
+        mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
+        sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        Log.d("TAG", "onCreateView: " + cityName);
+        if (savedInstanceState == null) {
+            mViewModel.reload();
+        }
 
         citiesWeather = view.findViewById(R.id.citiesWeather);
 
@@ -66,10 +60,6 @@ public class MainFragment extends Fragment {
                 getContext(),
                 R.layout.cities_row,
                 items
-        );
-
-        sharedViewModel = ViewModelProviders.of(getActivity()).get(
-                SharedViewModel.class
         );
 
         citiesWeather.setAdapter(citiesAdapter);
@@ -85,8 +75,7 @@ public class MainFragment extends Fragment {
             }
         });
 
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
-        mViewModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
+        mViewModel.getCities("").observe(getViewLifecycleOwner(), cities -> {
             citiesAdapter.clear();
             citiesAdapter.addAll(cities);
         });
@@ -125,23 +114,6 @@ public class MainFragment extends Fragment {
         setHasOptionsMenu(true);
     }
 
-    private class RefreshDataTask extends AsyncTask<Void, Void, ArrayList<City>>  {
-        @Override
-        protected ArrayList<City> doInBackground(Void... voids) {
-            CitiesAPI api = new CitiesAPI();
-            ArrayList<City> result = api.getCitiesByCapital();
-            Log.d("DEBUG", result.toString());
-            return result;
-        }
-        @Override
-        protected void onPostExecute(ArrayList<City> cities) {
-            citiesAdapter.clear();
-            for (City city : cities) {
-                citiesAdapter.add(city);
-            }
-        }
-    }
-
     private void refresh() {
         mViewModel.reload();
     }
@@ -150,21 +122,18 @@ public class MainFragment extends Fragment {
     public void onStart() {
         super.onStart();
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
 
         String cityName = preferences.getString("cityNameKey","");
 
-        mViewModel = ViewModelProviders.of(this).get(MainViewModel.class);
         mViewModel.getCities(cityName).removeObservers(getViewLifecycleOwner());
 
-        if (cityName.equals("")){
+        if (!cityName.equals("")){
             mViewModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
                 citiesAdapter.clear();
                 citiesAdapter.addAll(cities);
             });
-        }
-
-        if (preferences.getBoolean("alphaOrder",false)){
+        } else if (preferences.getBoolean("alphaOrder",false)){
             mViewModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
                 citiesAdapter.clear();
                 citiesAdapter.addAll(cities);
@@ -179,9 +148,12 @@ public class MainFragment extends Fragment {
                 citiesAdapter.clear();
                 citiesAdapter.addAll(cities);
             });
+        } else if (preferences.getBoolean("typeOfWeather",false)) {
+            mViewModel.getCitiesOrderedByTypeWeather().observe(getViewLifecycleOwner(), cities -> {
+                citiesAdapter.clear();
+                citiesAdapter.addAll(cities);
+            });
         }
-
-
 
     }
 }

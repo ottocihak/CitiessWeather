@@ -35,6 +35,7 @@ public class CitiesAdapter extends ArrayAdapter<City> {
 
         binding.cityName.setText(city.getName());
         binding.cityMainWeather.setText(city.getMain());
+        binding.tempRow.setText(city.getTemp()+ "ºF");
 
         Glide.with(getContext())
                 .load(city.getIcon())

@@ -1,32 +1,38 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory app:title="Filters">
-
+    <PreferenceCategory app:title="Filter by">
 
 
         <EditTextPreference
             android:key="cityNameKey"
             android:title="City name"
-            app:useSimpleSummaryProvider="true"/>
-        <CheckBoxPreference
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:key="alphaOrder"
-            app:title="Alphabetical Order"
-            android:enabled="true"
             app:useSimpleSummaryProvider="true" />
         <CheckBoxPreference
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:key="coldestToHottest"
-            app:title="Coldest to hottest"
             android:enabled="true"
+            android:key="alphaOrder"
+            android:title="Alphabetical Order"
             app:useSimpleSummaryProvider="true" />
         <CheckBoxPreference
-            app:key="hottestToColdest"
-            app:title="Hottest  to coldest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:enabled="true"
+            android:key="coldestToHottest"
+            android:title="Coldest to hottest"
+            app:useSimpleSummaryProvider="true" />
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="hottestToColdest"
+            android:title="Hottest  to coldest"
+            app:useSimpleSummaryProvider="true" />
+        <CheckBoxPreference
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:enabled="true"
+            android:key="typeOfWeather"
+            android:title="Type of weather"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
