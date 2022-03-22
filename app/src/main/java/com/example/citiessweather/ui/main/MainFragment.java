@@ -48,10 +48,6 @@ public class MainFragment extends Fragment {
         mViewModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
 
-        if (savedInstanceState == null) {
-            mViewModel.reload();
-        }
-
         citiesWeather = view.findViewById(R.id.citiesWeather);
 
         ArrayList<City> items = new ArrayList<>();
