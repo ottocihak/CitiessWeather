@@ -27,6 +27,11 @@ public class CitiesAPI {
         return doCall(url);
     }
 
+    public ArrayList<City> getCity(String city, String country) {
+        String json = "{\"data\":[{\"name\":\""+country+"\",\"capital\":\""+city+"\"}]}";
+        return processJson(json);
+    }
+
     HashMap<String,String> getWeather(String city){
         try {
             if (city==null) return null;
@@ -87,39 +92,40 @@ public class CitiesAPI {
             JSONObject data = new JSONObject(jsonResponse);
             JSONArray jsonCities = data.getJSONArray("data");
 
+            Log.e("processJson: ", data.toString());
             Log.d("DEBUG",""+jsonCities.length());
 
             for (int i = 0; i < jsonCities.length(); i++) {
 
                 JSONObject jsonCity = jsonCities.getJSONObject(i);
+                String capital = jsonCity.getString("capital");
 
-                if (!jsonCity.getString("capital").contains(" ")) {
+                if (capital.contains(" ")) capital = capital.replaceAll(" ", "");
+
                 City city = new City();
                 city.setName(jsonCity.getString("capital"));
                 city.setCountry(jsonCity.getString("name"));
 
-                HashMap<String,String> weather = getWeather(city.getName());
+                HashMap<String,String> weather = getWeather(capital);
 
                     if (weather!=null) {
-                    city.setMain(weather.get("main"));
-                    city.setDescription(weather.get("description"));
-                    city.setTemp(weather.get("temp"));
-                    city.setIcon(weather.get("pic"));
-                    city.setTemp_max(weather.get("temp_max"));
-                    city.setTemp_min(weather.get("temp_min"));
-                    city.setHumidity(weather.get("humidity"));
-                    String lon = weather.get("lon");
-                    String lat = weather.get("lat");
-                        Log.d("DEBUG",""+Integer.valueOf(lon.substring(0,lon.indexOf('.')==-1?lon.length():lon.indexOf('.'))));
-                    city.setLon(Integer.valueOf(lon.substring(0,lon.indexOf('.')==-1?lon.length():lon.indexOf('.'))));
-                    city.setLat(Integer.valueOf(lat.substring(0,lat.indexOf('.')==-1?lat.length():lat.indexOf('.'))));
+                        city.setMain(weather.get("main"));
+                        city.setDescription(weather.get("description"));
+                        city.setTemp(weather.get("temp"));
+                        city.setIcon(weather.get("pic"));
+                        city.setTemp_max(weather.get("temp_max"));
+                        city.setTemp_min(weather.get("temp_min"));
+                        city.setHumidity(weather.get("humidity"));
+                        String lon = weather.get("lon");
+                        String lat = weather.get("lat");
+                            Log.d("DEBUG",""+Integer.valueOf(lon.substring(0,lon.indexOf('.')==-1?lon.length():lon.indexOf('.'))));
+                        city.setLon(Double.parseDouble(lon));
+                        city.setLat(Double.parseDouble(lat));
 
+                        Log.d("DEBUG", "" + i);
 
-                    Log.d("DEBUG", "" + i);
-
-                    cities.add(city);
+                        cities.add(city);
                     }
-                }
 
             }
         } catch (JSONException e) {

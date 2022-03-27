@@ -23,6 +23,10 @@
             android:enabled="true"
             android:key="hottestToColdest"
             android:title="Hottest  to coldest" />
+        <CheckBoxPreference
+            android:enabled="true"
+            android:key="typeOfWeather"
+            android:title="Type of weather" />
 
     </PreferenceCategory>
 

@@ -22,6 +22,7 @@ import com.example.citiessweather.ui.main.MapFragment;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -76,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
         model = new ViewModelProvider(this).get(MainViewModel.class);
 
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         model.setFusedLocationClient(fusedLocationClient);
         model.getCheckPermission().observe(this, permission -> checkPermission());
 
@@ -124,6 +126,8 @@ public class MainActivity extends AppCompatActivity {
                             )
                             .build(),
                     RC_SIGN_IN);
+        } else {
+            model.setCurrentUser(auth.getCurrentUser());
         }
     }
 

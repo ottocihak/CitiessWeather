@@ -9,34 +9,26 @@ import android.location.Location;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.bumptech.glide.Glide;
-import com.example.citiessweather.R;
 import com.example.citiessweather.cities.CitiesAPI;
 import com.example.citiessweather.cities.City;
-import com.example.citiessweather.database.CitiesDao;
-import com.example.citiessweather.database.DataManager;
-import com.firebase.ui.database.FirebaseListAdapter;
-import com.firebase.ui.database.FirebaseListOptions;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,16 +38,16 @@ import java.util.Locale;
 public class MainViewModel extends AndroidViewModel {
 
     private final Application app;
-    private final DataManager dataManager;
-    private final CitiesDao citiesDao;
-    private LiveData<List<City>> cities;
+    private MutableLiveData<City> currentCitys = new MutableLiveData<>();
+    private String currentCity;
+    private String currentCountry;
 
     private final MutableLiveData<String> currentAddress = new MutableLiveData<>();
     private final MutableLiveData<String> checkPermission = new MutableLiveData<>();
     private final MutableLiveData<Boolean> progressBar = new MutableLiveData<>();
     private final MutableLiveData<LatLng> currentPosition = new MutableLiveData<>();
     private MutableLiveData<FirebaseUser> currentUser = new MutableLiveData<>();
-    private MutableLiveData<DatabaseReference> evidenceRef = new MutableLiveData<>();
+    private MutableLiveData<Query> query = new MutableLiveData<>();
     private DatabaseReference citiesReferences;
 
     private boolean trackingLocation;
@@ -66,52 +58,11 @@ public class MainViewModel extends AndroidViewModel {
         super(application);
 
         this.app = application;
-        this.dataManager = DataManager.getDatabase(
-                this.getApplication());
-        this.citiesDao = dataManager.getCitiesDao();
+
+        DatabaseReference data = FirebaseDatabase.getInstance().getReference();
+        citiesReferences = data.child("cities");
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getApplication().getApplicationContext());
-    }
-
-    //---------------------------------------------------
-    public LiveData<List<City>> getCities(String name) {
-        return citiesDao.getCities(name);
-    }
-    public LiveData<List<City>> getCitiesCloseBy(int lon, int lat) {
-        return citiesDao.getCitiesCloseBy(lon,lat);
-    }
-    public LiveData<List<City>> getCitiesOrderedByTempC() {
-        return citiesDao.getCitiesOrderedByTempC();
-    }
-    public LiveData<List<City>> getCitiesOrderedByTempH() {
-        return citiesDao.getCitiesOrderedByTempH();
-    }
-    //---------------------------------------------------
-
-    public void cityAdapter (Query query) {
-        FirebaseListOptions<City> options = new FirebaseListOptions.Builder<City>()
-                .setQuery(query, City.class)
-                .setLayout(R.layout.cities_row)
-                .setLifecycleOwner(getApplication())
-                .build();
-
-        FirebaseListAdapter<City> adapter = new FirebaseListAdapter<City>(options) {
-            @Override
-            protected void populateView(View v, City city, int position) {
-                TextView cityName = v.findViewById(R.id.cityName);
-                TextView mainWeather = v.findViewById(R.id.cityMainWeather);
-                ImageView weatherIcon = v.findViewById(R.id.weatherIcon);
-
-                cityName.setText(city.getName());
-                mainWeather.setText(city.getMain());
-                Glide.with(getApplication())
-                        .load(city.getIcon())
-                        .into(weatherIcon);
-            }
-        };
-
-//        ListView listView = binding.notificationList;
-//        listView.setAdapter(adapter);
     }
 
     public void setFusedLocationClient(FusedLocationProviderClient fusedLocationClient) {
@@ -126,11 +77,11 @@ public class MainViewModel extends AndroidViewModel {
         return progressBar;
     }
 
+    public MutableLiveData<LatLng> getCurrentPosition () {return currentPosition;}
+
     public LiveData<String> getCheckPermission() {
         return checkPermission;
     }
-
-    public LiveData<LatLng> getCurrentPosition () {return currentPosition;}
 
     public LiveData<FirebaseUser> getCurrentUser () {
         if (currentUser == null){
@@ -139,10 +90,18 @@ public class MainViewModel extends AndroidViewModel {
         return currentUser;
     }
 
-    public LiveData<DatabaseReference> getEvidenceRef () {return evidenceRef;}
+    public LiveData<Query> getQuery () {return query;}
+
+    public DatabaseReference getCitiesReferences () {return citiesReferences;}
+
+    public LiveData<City> getCurrentCity () {return currentCitys;}
 
     public void setCurrentUser(FirebaseUser currentUser) {
         this.currentUser.postValue(currentUser);
+    }
+
+    public void setQuery(Query query) {
+        this.query.postValue(query);
     }
 
     private LocationCallback locationCallback = new LocationCallback() {
@@ -206,6 +165,41 @@ public class MainViewModel extends AndroidViewModel {
         task.execute();
     }
 
+    public void addNewCity (String currentCity, String currentCountry) {
+        boolean[] found = {false};
+        ValueEventListener valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                List<String> list = new ArrayList<>();
+                for(DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String name = ds.child("name").getValue(String.class);
+                    list.add(name);
+                }
+
+                for(String str : list) {
+                    if(str.contains(currentCity)) {
+                        Log.e("TAG", "String found!");
+                        found[0] = true;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {}
+        };
+        citiesReferences.addListenerForSingleValueEvent(valueEventListener);
+
+        if (!found[0]) {
+            CitiesAPI api = new CitiesAPI();
+            ArrayList<City> result;
+
+            result = api.getCity(currentCity,currentCountry);
+            City city = result.get(0);
+            currentCitys.postValue(city);
+            DatabaseReference citiesReference = citiesReferences.push();
+            citiesReference.setValue(city);
+        }
+    }
+
     private class RefreshDataTask extends AsyncTask<Void,Void,Void> {
         @Override
         protected Void doInBackground(Void... voids) {
@@ -215,10 +209,6 @@ public class MainViewModel extends AndroidViewModel {
 
             result = api.getCitiesByCapital();
 
-            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-            DatabaseReference data = FirebaseDatabase.getInstance().getReference();
-
-            citiesReferences = data.child("cities");
             citiesReferences.removeValue();
 
             Log.e("doInBackground: ", ""+result.size() );
@@ -228,9 +218,7 @@ public class MainViewModel extends AndroidViewModel {
                 DatabaseReference citiesReference = citiesReferences.push();
                 citiesReference.setValue(citiesList);
             }
-
-            citiesDao.deleteCities();
-            citiesDao.addCities(result);
+            addNewCity(currentCity,currentCountry);
 
             return null;
         }
@@ -261,6 +249,8 @@ public class MainViewModel extends AndroidViewModel {
                         location.getLatitude(),
                         location.getLongitude(),
                         1);
+                currentCity = addresses.get(0).getLocality();
+                currentCountry = addresses.get(0).getCountryName();
 
                 if (addresses == null || addresses.size() == 0) {
                     if (resultMessage.isEmpty()) {

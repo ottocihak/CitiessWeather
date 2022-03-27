@@ -92,7 +92,7 @@
         app:layout_constraintTop_toBottomOf="@+id/humility" />
 
     <ListView
-        android:id="@+id/citiesCloseByList"
+        android:id="@+id/citiesWarnings"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"

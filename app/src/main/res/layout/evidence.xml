@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:background="#00FFFFFF"
     tools:context=".ui.main.EvidenceFragment">
 
     <com.google.android.material.textfield.TextInputEditText
@@ -96,6 +97,23 @@
         app:layout_constraintTop_toBottomOf="@+id/evidenceMainWeather" />
 
     <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/warnigWeather"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:hint="Warnig"
+        android:inputType="textMultiLine"
+        android:overScrollMode="always"
+        android:singleLine="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/address" />
+
+    <com.google.android.material.textfield.TextInputEditText
         android:id="@+id/evidenceLon"
         android:layout_width="168dp"
         android:layout_height="50dp"
@@ -110,6 +128,67 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/evidenceLat"
         app:layout_constraintTop_toBottomOf="@+id/evidneceTitle" />
+
+    <ImageButton
+        android:id="@+id/picBtn"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="#009F5454"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_baseline_camera_alt_24"
+        android:tint="#4A780A"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/warnigWeather" />
+
+    <ImageButton
+        android:id="@+id/micBtn"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:background="#009F5454"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_baseline_mic_24"
+        android:tint="@color/black"
+        app:layout_constraintEnd_toStartOf="@+id/playBtn"
+        app:layout_constraintStart_toEndOf="@+id/picView"
+        app:layout_constraintTop_toBottomOf="@+id/warnigWeather" />
+
+    <Button
+        android:id="@+id/NotifyEv"
+        style="@style/FirebaseUI.Button.AccountChooser.AppleButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Send"
+        android:textSize="24sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageButton
+        android:id="@+id/playBtn"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="#00FFFFFF"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_baseline_play_circle_filled_24"
+        android:tint="@color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/warnigWeather" />
+
+    <ImageView
+        android:id="@+id/picView"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/ic_baseline_warning_24"
+        app:layout_constraintStart_toEndOf="@+id/picBtn"
+        app:layout_constraintTop_toBottomOf="@+id/warnigWeather" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

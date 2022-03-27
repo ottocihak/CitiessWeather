@@ -19,8 +19,8 @@ public class City implements Serializable {
     String temp_max;
     String humidity;
     String country;
-    int lon;
-    int lat;
+    double lon;
+    double lat;
 
     public int getId() {return id;}
 
@@ -103,19 +103,19 @@ public class City implements Serializable {
         this.country = country;
     }
 
-    public int getLon() {
+    public double getLon() {
         return lon;
     }
 
-    public void setLon(int lon) {
+    public void setLon(double lon) {
         this.lon = lon;
     }
 
-    public int getLat() {
+    public double getLat() {
         return lat;
     }
 
-    public void setLat(int lat) {
+    public void setLat(double lat) {
         this.lat = lat;
     }
 }

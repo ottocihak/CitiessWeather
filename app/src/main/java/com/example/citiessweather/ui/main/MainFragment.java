@@ -1,24 +1,19 @@
 package com.example.citiessweather.ui.main;
 
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.preference.CheckBoxPreference;
 import androidx.preference.PreferenceManager;
 
 import com.bumptech.glide.Glide;
 import com.example.citiessweather.databinding.MainFragmentBinding;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -32,13 +27,10 @@ import android.widget.TextView;
 import com.example.citiessweather.DetailsActivity;
 import com.example.citiessweather.R;
 import com.example.citiessweather.SettingsActivity;
-import com.example.citiessweather.cities.CitiesAPI;
-import com.example.citiessweather.cities.CitiesAdapter;
 import com.example.citiessweather.cities.City;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.firebase.ui.database.FirebaseListOptions;
-
-import java.util.ArrayList;
+import com.google.firebase.database.Query;
 
 public class MainFragment extends Fragment {
 
@@ -47,7 +39,6 @@ public class MainFragment extends Fragment {
 
     private MainViewModel mainModel;
     private ListView citiesWeather;
-    private CitiesAdapter citiesAdapter;
     private SharedViewModel sharedViewModel;
 
     public static MainFragment newInstance() {
@@ -64,34 +55,6 @@ public class MainFragment extends Fragment {
 
         mainModel = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
         sharedViewModel = new ViewModelProvider(requireActivity()).get(SharedViewModel.class);
-
-        citiesWeather = binding.citiesWeather;
-
-        ArrayList<City> items = new ArrayList<>();
-
-        citiesAdapter = new CitiesAdapter(
-                getContext(),
-                R.layout.cities_row,
-                items
-        );
-
-        citiesWeather.setAdapter(citiesAdapter);
-
-        citiesWeather.setOnItemClickListener((adapter, fragment, i, l) -> {
-            City city = (City) adapter.getItemAtPosition(i);
-            if (!isTablet()) {
-                Intent intent = new Intent(getContext(), DetailsActivity.class);
-                intent.putExtra("city", city);
-                startActivity(intent);
-            } else {
-                sharedViewModel.select(city);
-            }
-        });
-
-        mainModel.getCities("").observe(getViewLifecycleOwner(), cities -> {
-            citiesAdapter.clear();
-            citiesAdapter.addAll(cities);
-        });
 
         return view;
     }
@@ -139,60 +102,64 @@ public class MainFragment extends Fragment {
 
         String cityName = preferences.getString("cityNameKey","");
 
-        mainModel.getCities(cityName).removeObservers(getViewLifecycleOwner());
+        Query queryBase = mainModel.getCitiesReferences().orderByChild("name");
+        mainModel.setQuery(queryBase);
 
-        if (cityName.equals("")){
-            mainModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
-                citiesAdapter.clear();
-                citiesAdapter.addAll(cities);
-            });
-        }
-
-        if (preferences.getBoolean("alphaOrder",false)){
-            mainModel.getCities(cityName).observe(getViewLifecycleOwner(), cities -> {
-                citiesAdapter.clear();
-                citiesAdapter.addAll(cities);
-            });
+        if (!cityName.equals("")){
+            Query query = mainModel.getCitiesReferences().orderByChild("name").equalTo(cityName);
+            mainModel.setQuery(query);
+        } else if (preferences.getBoolean("alphaOrder",false)){
+            Query query = mainModel.getCitiesReferences().orderByChild("name");
+            mainModel.setQuery(query);
         } else if (preferences.getBoolean("coldestToHottest",false)){
-            mainModel.getCitiesOrderedByTempC().observe(getViewLifecycleOwner(), cities -> {
-                citiesAdapter.clear();
-                citiesAdapter.addAll(cities);
-            });
+            Query query = mainModel.getCitiesReferences().orderByChild("temp");
+            mainModel.setQuery(query);
         } else if (preferences.getBoolean("hottestToColdest",false)) {
-            mainModel.getCitiesOrderedByTempH().observe(getViewLifecycleOwner(), cities -> {
-                citiesAdapter.clear();
-                citiesAdapter.addAll(cities);
-            });
+            Query query = mainModel.getCitiesReferences().orderByChild("temp");
+            mainModel.setQuery(query);
         } else if (preferences.getBoolean("typeOfWeather",false)) {
-            mainModel.getCitiesOrderedByTempH().observe(getViewLifecycleOwner(), cities -> {
-                citiesAdapter.clear();
-                citiesAdapter.addAll(cities);
-            });
+            Query query = mainModel.getCitiesReferences().orderByChild("main");
+            mainModel.setQuery(query);
         }
 
-        FirebaseListOptions<City> options = new FirebaseListOptions.Builder<City>()
-                .setQuery(query, City.class)
-                .setLayout(R.layout.cities_row)
-                .setLifecycleOwner(this)
-                .build();
+        mainModel.getQuery().observe(getViewLifecycleOwner(), query -> {
 
-        FirebaseListAdapter<City> adapter = new FirebaseListAdapter<City>(options) {
-            @Override
-            protected void populateView(View v, City city, int position) {
-                TextView cityName = v.findViewById(R.id.cityName);
-                TextView mainWeather = v.findViewById(R.id.cityMainWeather);
-                ImageView weatherIcon = v.findViewById(R.id.weatherIcon);
+            FirebaseListOptions<City> options = new FirebaseListOptions.Builder<City>()
+                    .setQuery(query, City.class)
+                    .setLayout(R.layout.cities_row)
+                    .setLifecycleOwner(this)
+                    .build();
 
-                cityName.setText(city.getName());
-                mainWeather.setText(city.getMain());
-                Glide.with(requireContext())
-                        .load(city.getIcon())
-                        .into(weatherIcon);
-            }
-        };
+            FirebaseListAdapter<City> adapter = new FirebaseListAdapter<City>(options) {
+                @Override
+                protected void populateView(View v, City city, int position) {
+                    TextView cityName = v.findViewById(R.id.cityName);
+                    TextView mainWeather = v.findViewById(R.id.cityMainWeather);
+                    ImageView weatherIcon = v.findViewById(R.id.weatherIcon);
+                    TextView cityTemp = v.findViewById(R.id.cityTemp);
 
-        ListView listView = binding.notificationList;
-        listView.setAdapter(adapter);
+                    cityName.setText(city.getName());
+                    mainWeather.setText(city.getMain());
+                    cityTemp.setText(city.getTemp()+" ºF");
+                    Glide.with(requireContext())
+                            .load(city.getIcon())
+                            .into(weatherIcon);
+                }
+            };
 
+            citiesWeather = binding.citiesWeather;
+            citiesWeather.setAdapter(adapter);
+
+            citiesWeather.setOnItemClickListener((adapter1, fragment, i, l) -> {
+                City city = (City) adapter.getItem(i);
+                if (!isTablet()) {
+                    Intent intent = new Intent(getContext(), DetailsActivity.class);
+                    intent.putExtra("city", city);
+                    startActivity(intent);
+                } else {
+                    sharedViewModel.select(city);
+                }
+            });
+        });
     }
 }
