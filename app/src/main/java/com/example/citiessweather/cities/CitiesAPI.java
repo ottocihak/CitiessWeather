@@ -30,7 +30,7 @@ public class CitiesAPI {
     HashMap<String,String> getWeather(String city){
         try {
             if (city==null) return null;
-            String url = "https://api.openweathermap.org/data/2.5/weather?q="+city.toLowerCase(Locale.ROOT)+"&appid=0fa3458c2e34936b0dad44dc6699956c";
+            String url = "https://api.openweathermap.org/data/2.5/weather?q="+city.toLowerCase()+"&appid=0fa3458c2e34936b0dad44dc6699956c";
             String jsonResponse = HttpUtils.get(url);
             return processJsonWeather(jsonResponse);
         } catch (IOException e) {
@@ -93,7 +93,7 @@ public class CitiesAPI {
 
                 JSONObject jsonCity = jsonCities.getJSONObject(i);
 
-                if (jsonCity.getString("capital").indexOf(" ") == -1) {
+                if (!jsonCity.getString("capital").contains(" ")) {
                 City city = new City();
                 city.setName(jsonCity.getString("capital"));
                 city.setCountry(jsonCity.getString("name"));
