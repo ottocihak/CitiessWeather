@@ -36,6 +36,10 @@ public class MainActivity extends AppCompatActivity {
     private static final int RC_SIGN_IN = 0;
     FusedLocationProviderClient fusedLocationClient;
 
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private boolean permissionToRecordAccepted = false;
+    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+
     FragmentManager manager = getSupportFragmentManager();
     private MainViewModel model;
 
@@ -80,6 +84,7 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         model.setFusedLocationClient(fusedLocationClient);
         model.getCheckPermission().observe(this, permission -> checkPermission());
+//        model.getCheckPermissionAudio().observe(this, permission -> checkPermission());
 
         BottomNavigationView nav = findViewById(R.id.navigation);
         nav.setOnNavigationItemSelectedListener(onNavigationItemSelectedListener);
@@ -153,6 +158,13 @@ public class MainActivity extends AppCompatActivity {
                             {Manifest.permission.ACCESS_FINE_LOCATION},
                     REQUEST_LOCATION_PERMISSION);
         }
+//        else if (ActivityCompat.checkSelfPermission(
+//                this, Manifest.permission.RECORD_AUDIO)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            ActivityCompat.requestPermissions(this, new String[]
+//                            {Manifest.permission.RECORD_AUDIO},
+//                    REQUEST_RECORD_AUDIO_PERMISSION);
+//        }
         else {
             model.startTrackingLocation(false);
         }
@@ -167,12 +179,25 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode==REQUEST_LOCATION_PERMISSION) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                model.switchTrackingLocation();
+                model.startTrackingLocation(false);
             } else {
                 Toast.makeText(this,
-                        "Denied",
+                        "Location denied",
                         Toast.LENGTH_SHORT).show();
             }
         }
+//        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
+//            if (grantResults.length > 0
+//                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                permissionToRecordAccepted = true;
+//            } else {
+//                Toast.makeText(
+//                        this,
+//                        "Permission to record required",
+//                        Toast.LENGTH_LONG
+//                ).show();
+//                this.finish();
+//            }
+//        }
     }
 }

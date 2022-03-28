@@ -15,4 +15,5 @@ public class SharedViewModel extends ViewModel {
     public LiveData<City> getSelected() {
         return selected;
     }
+
 }

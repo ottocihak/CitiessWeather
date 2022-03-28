@@ -5,14 +5,15 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.citiessweather.Evidence.Evidence;
-import com.example.citiessweather.Evidence.EvidenceInfoWindowAdapter;
 import com.example.citiessweather.R;
 import com.example.citiessweather.cities.City;
-import com.example.citiessweather.cities.CityInfoWindowAdapter;
 import com.example.citiessweather.databinding.MapFragmentBinding;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -40,6 +41,7 @@ public class MapFragment extends Fragment {
     private View view;
     private MapFragmentBinding binding;
     private MainViewModel model;
+    private SupportMapFragment mapFragment;
 
     @Nullable
     @Override
@@ -50,8 +52,37 @@ public class MapFragment extends Fragment {
         binding = MapFragmentBinding.inflate(inflater);
         view = binding.getRoot();
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+        mapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.googleMap);
+
+        return view;
+    }
+
+    public void onCreateOptionsMenu(@NonNull Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_map, menu);
+    }
+
+    public void onCreate (@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_refresh_map) {
+            onStart();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
 
         DatabaseReference data = FirebaseDatabase.getInstance().getReference();
         DatabaseReference users = data.child("users");
@@ -71,7 +102,7 @@ public class MapFragment extends Fragment {
                         ActivityCompat.checkSelfPermission(requireActivity(),
                                 Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-                }else {
+                } else {
                     map.setMyLocationEnabled(true);
                     MutableLiveData<LatLng> currentPosition = model.getCurrentPosition();
 
@@ -94,7 +125,7 @@ public class MapFragment extends Fragment {
                                     Double.parseDouble(evidence.getLon())
                             );
 
-                            EvidenceInfoWindowAdapter customInfoWindow = new EvidenceInfoWindowAdapter(
+                            InfoWindowAdapter customInfoWindow = new InfoWindowAdapter(
                                     getActivity()
                             );
 
@@ -123,25 +154,25 @@ public class MapFragment extends Fragment {
                     model.getCitiesReferences().addChildEventListener(new ChildEventListener() {
 
                         @Override
-                        public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-                            City city = snapshot.getValue(City.class);
+                        public void onChildAdded(@NonNull DataSnapshot snapshot1, @Nullable String previousChildName) {
+                            City city = snapshot1.getValue(City.class);
 
                             LatLng position = new LatLng(
                                     city.getLat(),
                                     city.getLon()
                             );
 
-                            CityInfoWindowAdapter customInfoWindow = new CityInfoWindowAdapter(
+                            InfoWindowAdapter InfoWindowAdapter = new InfoWindowAdapter(
                                     getActivity()
                             );
 
-                            Marker marker = map.addMarker(new MarkerOptions()
+                            Marker marker1 = map.addMarker(new MarkerOptions()
                                     .title(city.getMain())
                                     .position(position)
                                     .snippet(city.getTemp())
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
-                            marker.setTag(city);
-                            map.setInfoWindowAdapter(customInfoWindow);
+                            marker1.setTag(city);
+                            map.setInfoWindowAdapter(InfoWindowAdapter);
                         }
 
                         @Override
@@ -159,13 +190,6 @@ public class MapFragment extends Fragment {
                 }
             });
         });
-
-        return view;
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
     }
 
     @Override

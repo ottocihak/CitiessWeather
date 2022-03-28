@@ -152,6 +152,7 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_baseline_mic_24"
         android:tint="@color/black"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/playBtn"
         app:layout_constraintStart_toEndOf="@+id/picView"
         app:layout_constraintTop_toBottomOf="@+id/warnigWeather" />
@@ -177,6 +178,7 @@
         android:scaleType="fitCenter"
         android:src="@drawable/ic_baseline_play_circle_filled_24"
         android:tint="@color/black"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/warnigWeather" />
 

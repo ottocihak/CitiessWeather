@@ -14,6 +14,7 @@ import androidx.preference.PreferenceManager;
 import com.bumptech.glide.Glide;
 import com.example.citiessweather.databinding.MainFragmentBinding;
 
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -74,6 +75,10 @@ public class MainFragment extends Fragment {
 
         if (id == R.id.action_refresh) {
             refresh();
+            return true;
+        }
+        if (id == R.id.action_refresh_city) {
+            mainModel.addNewCity();
             return true;
         }
         if (id == R.id.settings) {

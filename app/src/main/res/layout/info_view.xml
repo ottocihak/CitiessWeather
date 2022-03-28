@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_blue"
-    android:backgroundTint="@color/light_blue">
+    android:background="#FD8E2D"
+    android:backgroundTint="#FD8E2D">
 
     <ImageView
         android:id="@+id/marker_pic"

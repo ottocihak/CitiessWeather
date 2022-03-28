@@ -73,11 +73,8 @@ public class EvidenceFragment extends Fragment {
     private ImageButton playBtn;
     private MediaRecorder mediaRecorder;
     private MediaPlayer player;
-    private File recordName;
+    private String recordName;
     private String recorded;
-    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
-    private boolean permissionToRecordAccepted = false;
-    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
 
     @Nullable
     @Override
@@ -86,9 +83,6 @@ public class EvidenceFragment extends Fragment {
         binding = EvidenceBinding.inflate(inflater);
         view = binding.getRoot();
         model = new ViewModelProvider(requireActivity()).get(MainViewModel.class);
-
-//        ActivityCompat.requestPermissions(requireActivity(), permissions,
-//                REQUEST_RECORD_AUDIO_PERMISSION);
 
         mainWeatherText = binding.evidenceMainWeather;
         minTemText = binding.evidenceMinTemp;
@@ -122,66 +116,69 @@ public class EvidenceFragment extends Fragment {
                 this.city = city.getName();
             });
 
-//            micBtn.setOnClickListener(button -> {
-//                if (mediaRecorder == null) {
-//                    updateView("rec");
-//                    mediaRecorder = new MediaRecorder();
-//                    mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-//                    mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
-//                    newFile();
-//                    mediaRecorder.setOutputFile(recordName.getAbsolutePath());
-//                    mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-//
-//                    try {
-//                        mediaRecorder.prepare();
-//                    } catch (IOException e) {
-//                        Log.e("onClick: ","not able to record");
-//                    }
-//                    mediaRecorder.start();
-//                } else {
-//                    updateView("stop");
-//                    mediaRecorder.stop();
-//                    mediaRecorder.reset();
-//                    mediaRecorder.release();
-//                    mediaRecorder = null;
-//
-//                    FirebaseStorage storage = FirebaseStorage.getInstance();
-//                    StorageReference reference = storage.getReference();
-//                    StorageReference recRef = reference.child(recordName.getAbsolutePath());
-//                    Uri recUri = FileProvider.getUriForFile(requireContext(),
-//                            "com.example.android.fileprovider",
-//                            recordName);
-//                    UploadTask uploadTask = recRef.putFile(recUri);
-//                    uploadTask.addOnSuccessListener(taskSnapshot -> {
-//                        recRef.getDownloadUrl().addOnCompleteListener(task -> {
-//                            Uri downloadUri = task.getResult();
-//                            recorded = downloadUri.toString();
-//                            Log.e("XXXXX",""+recorded);
-//                        });
-//                    });
-//                }
-//            });
-//
-//            playBtn.setOnClickListener(button -> {
-//                if (mediaRecorder == null && player == null) {
-//                    player = new MediaPlayer();
-//
-//                    try {
-//                        player.setDataSource(String.valueOf(recordName));
-//                        player.prepare();
-//                        player.start();
-//
-//                        player.setOnCompletionListener(mediaPlayer -> {
-//                            player.stop();
-//                            player.release();
-//                            player = null;
-//                        });
-//
-//                    }catch (Exception e){
-//                        Log.e("onClick: ", "not able to play media");
-//                    }
-//                }
-//            });
+            model.getCheckPermissionAudio().observe(getViewLifecycleOwner(), permission -> {
+                micBtn.setOnClickListener(button -> {
+                    if (mediaRecorder == null) {
+                        try {
+                            updateView("rec");
+                            mediaRecorder = new MediaRecorder();
+                            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP);
+                            newFile();
+                            mediaRecorder.setOutputFile(recordName);
+                            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
+
+                            mediaRecorder.prepare();
+                        } catch (IOException e) {
+                            Log.e("onClick: ", "not able to record: "+e.getMessage());
+                        }
+                        mediaRecorder.start();
+                    } else {
+                        updateView("stop");
+                        mediaRecorder.stop();
+                        mediaRecorder.reset();
+                        mediaRecorder.release();
+                        mediaRecorder = null;
+
+                        FirebaseStorage storage = FirebaseStorage.getInstance();
+                        StorageReference reference = storage.getReference();
+                        StorageReference recRef = reference.child(recordName);
+                        Uri recUri = FileProvider.getUriForFile(requireContext(),
+                                "com.example.android.fileprovider",
+                                new File(recordName));
+                        UploadTask uploadTask = recRef.putFile(recUri);
+                        uploadTask.addOnSuccessListener(taskSnapshot -> {
+                            recRef.getDownloadUrl().addOnCompleteListener(task -> {
+                                Uri downloadUri = task.getResult();
+                                recorded = downloadUri.toString();
+                                Log.e("XXXXX", "" + recorded);
+                            });
+                        });
+                    }
+                });
+
+                playBtn.setOnClickListener(button -> {
+                    if (mediaRecorder == null && player == null) {
+                        player = new MediaPlayer();
+
+                        try {
+                            player.setDataSource(String.valueOf(recordName));
+                            player.prepare();
+                            player.start();
+
+                            player.setOnCompletionListener(mediaPlayer -> {
+                                player.stop();
+                                player.release();
+                                player = null;
+                            });
+
+                        } catch (Exception e) {
+                            Log.e("onClick: ", "not able to play media");
+                        }
+                    }
+                });
+            });
+
 
             picBtn.setOnClickListener(button -> {
                 dispatchTakePictureIntent();
@@ -196,12 +193,12 @@ public class EvidenceFragment extends Fragment {
                         Uri downloadUri = task.getResult();
                         Glide.with(this).load(downloadUri).into(picView);
                         picTook = downloadUri.toString();
-                        Log.e("XXXXX",""+picTook);
+                        Log.e("XXXXX", "" + picTook);
                     });
                 });
             });
 
-            button.setOnClickListener(view ->{
+            button.setOnClickListener(v -> {
                 Evidence evidence = new Evidence();
                 evidence.setLat(latText.getText().toString());
                 evidence.setLon(lonText.getText().toString());
@@ -213,14 +210,14 @@ public class EvidenceFragment extends Fragment {
                 evidence.setPic(picTook);
                 evidence.setCity(city);
 //                evidence.setRecord();
-                Log.e("------------",""+evidence.getPic());
+                Log.e("------------", "" + evidence.getPic());
 
                 DatabaseReference data = FirebaseDatabase.getInstance().getReference();
                 DatabaseReference users = data.child("users");
                 DatabaseReference uid = users.child(firebaseUser.getUid());
                 DatabaseReference notify = uid.child("evidences");
 
-                Log.e("XXXXX",notify.toString());
+                Log.e("XXXXX", notify.toString());
 
                 DatabaseReference notificationReference = notify.push();
                 notificationReference.setValue(evidence);
@@ -289,9 +286,8 @@ public class EvidenceFragment extends Fragment {
     // audio recording
 
     private void newFile () {
-        String path = getContext().getExternalFilesDir(null).getAbsolutePath();
-        recordName = new File(path +
-                "/"+new SimpleDateFormat("dd/MM/yyyy_HH:mm").format(System.currentTimeMillis())+".3gp");
+        String path = requireContext().getExternalFilesDir(null).getAbsolutePath();
+        recordName =path + "/"+new SimpleDateFormat("dd/MM/yyyy_HH:mm").format(System.currentTimeMillis())+".3gp";
 
     }
 
@@ -308,25 +304,6 @@ public class EvidenceFragment extends Fragment {
                         (getResources().getDrawable(R.drawable.ic_baseline_mic_24));
                 micBtn.setImageTintList(getResources().getColorStateList(R.color.black));
                 break;
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == REQUEST_RECORD_AUDIO_PERMISSION) {
-            permissionToRecordAccepted = grantResults[0] ==
-                    PackageManager.PERMISSION_GRANTED;
-        }
-        if (!permissionToRecordAccepted) {
-            Toast.makeText(
-                    getContext(),
-                    "Permission required",
-                    Toast.LENGTH_LONG
-            ).show();
-            requireActivity().finish();
         }
     }
 

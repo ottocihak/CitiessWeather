@@ -44,6 +44,7 @@ public class MainViewModel extends AndroidViewModel {
 
     private final MutableLiveData<String> currentAddress = new MutableLiveData<>();
     private final MutableLiveData<String> checkPermission = new MutableLiveData<>();
+    private final MutableLiveData<String> checkPermissionAudio = new MutableLiveData<>();
     private final MutableLiveData<Boolean> progressBar = new MutableLiveData<>();
     private final MutableLiveData<LatLng> currentPosition = new MutableLiveData<>();
     private MutableLiveData<FirebaseUser> currentUser = new MutableLiveData<>();
@@ -81,6 +82,10 @@ public class MainViewModel extends AndroidViewModel {
 
     public LiveData<String> getCheckPermission() {
         return checkPermission;
+    }
+
+    public LiveData<String> getCheckPermissionAudio() {
+        return checkPermissionAudio;
     }
 
     public LiveData<FirebaseUser> getCurrentUser () {
@@ -152,7 +157,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-    private void stopTrackingLocation() {
+    public void stopTrackingLocation() {
         if (trackingLocation) {
             fusedLocationClient.removeLocationUpdates (locationCallback);
             trackingLocation = false;
@@ -165,38 +170,41 @@ public class MainViewModel extends AndroidViewModel {
         task.execute();
     }
 
-    public void addNewCity (String currentCity, String currentCountry) {
+    public void addNewCity () {
         boolean[] found = {false};
-        ValueEventListener valueEventListener = new ValueEventListener() {
+
+        citiesReferences.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 List<String> list = new ArrayList<>();
                 for(DataSnapshot ds : dataSnapshot.getChildren()) {
                     String name = ds.child("name").getValue(String.class);
-                    list.add(name);
-                }
-
-                for(String str : list) {
-                    if(str.contains(currentCity)) {
+                    if (name.equals(currentCity)) {
                         Log.e("TAG", "String found!");
                         found[0] = true;
+                        City city = ds.getValue(City.class);
+                        currentCitys.postValue(city);
                     }
+                    list.add(name);
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {}
-        };
-        citiesReferences.addListenerForSingleValueEvent(valueEventListener);
+        });
 
-        if (!found[0]) {
-            CitiesAPI api = new CitiesAPI();
-            ArrayList<City> result;
+        try {
+            if (!found[0]) {
+                CitiesAPI api = new CitiesAPI();
+                ArrayList<City> result;
 
-            result = api.getCity(currentCity,currentCountry);
-            City city = result.get(0);
-            currentCitys.postValue(city);
-            DatabaseReference citiesReference = citiesReferences.push();
-            citiesReference.setValue(city);
+                result = api.getCity(currentCity,currentCountry);
+                City city = result.get(0);
+                currentCitys.postValue(city);
+                DatabaseReference citiesReference = citiesReferences.push();
+                citiesReference.setValue(city);
+            }
+        } catch (Exception e) {
+            Log.e("addNewCity: ", ""+ e.getMessage());
         }
     }
 
@@ -218,7 +226,10 @@ public class MainViewModel extends AndroidViewModel {
                 DatabaseReference citiesReference = citiesReferences.push();
                 citiesReference.setValue(citiesList);
             }
-            addNewCity(currentCity,currentCountry);
+
+            if (currentCity != null) {
+                addNewCity();
+            }
 
             return null;
         }

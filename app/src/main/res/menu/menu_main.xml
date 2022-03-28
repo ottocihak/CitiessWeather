@@ -7,6 +7,11 @@
         android:title="Refresh"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_refresh_city"
+        android:orderInCategory="100"
+        android:title="Refresh current city"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/settings"
         android:orderInCategory="101"
         android:title="Settings" />
