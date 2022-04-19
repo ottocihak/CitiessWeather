@@ -1,6 +1,7 @@
 package com.example.citiessweather.ui.main;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,12 +12,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.citiessweather.DetailsActivity;
 import com.example.citiessweather.Evidence.Evidence;
 import com.example.citiessweather.R;
 import com.example.citiessweather.cities.City;
 import com.example.citiessweather.databinding.MapFragmentBinding;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
@@ -35,6 +38,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModelProvider;
+
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class MapFragment extends Fragment {
 
@@ -151,11 +157,15 @@ public class MapFragment extends Fragment {
                         public void onCancelled(@NonNull DatabaseError error) { }
                     });
 
+                    ArrayList<City> cities = new ArrayList<>();
                     model.getCitiesReferences().addChildEventListener(new ChildEventListener() {
+
 
                         @Override
                         public void onChildAdded(@NonNull DataSnapshot snapshot1, @Nullable String previousChildName) {
                             City city = snapshot1.getValue(City.class);
+                            cities.add(city);
+                            Log.e( "onChildAdded: ", city.getName());
 
                             LatLng position = new LatLng(
                                     city.getLat(),
@@ -173,6 +183,7 @@ public class MapFragment extends Fragment {
                                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW)));
                             marker1.setTag(city);
                             map.setInfoWindowAdapter(InfoWindowAdapter);
+
                         }
 
                         @Override
@@ -186,6 +197,24 @@ public class MapFragment extends Fragment {
 
                         @Override
                         public void onCancelled(@NonNull DatabaseError error) {}
+                    });
+
+                    map.setOnInfoWindowClickListener(marker -> {
+
+                        LatLng latLon = marker.getPosition();
+
+                        for (City city : cities) {
+                            LatLng position = new LatLng(
+                                    city.getLat(),
+                                    city.getLon()
+                            );
+                            if (latLon.equals(position)) {
+                                Intent intent = new Intent(getContext(), DetailsActivity.class);
+                                intent.putExtra("city", city);
+                                startActivity(intent);
+                            }
+
+                        }
                     });
                 }
             });

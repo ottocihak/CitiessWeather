@@ -1,6 +1,7 @@
 package com.example.citiessweather.ui.main;
 
 import com.example.citiessweather.Evidence.Evidence;
+import com.example.citiessweather.MainActivity;
 import com.example.citiessweather.R;
 import com.example.citiessweather.cities.City;
 import com.example.citiessweather.databinding.DetailsFragmentBinding;
